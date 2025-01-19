@@ -27,41 +27,33 @@ namespace Map
             lngLat = new Point(0, 0);
         }
 
-        public double getLatitude()
-        {
-            return lngLat.Y;
-        }
+        public double Latitude => lngLat.Y;
 
-        public double getLongitude()
-        {
-            return lngLat.X;
-        }
+        public double Longitude => lngLat.X;
 
-        public int getZoom()
-        {
-            return zoom;
-        }
+        // converts from 0 -> 22 range (for maps tile api) to 0 -> 100 range
+        public int Zoom => zoom * 100/22;
 
         //public async void getMapTile()
         //{
         //    if (sessionID == "none") ;
-                //sessionID = await http.PostAsync(
-                //    $"'{{\"mapType\": \"streetview\", \"language\": \"en-US\", \"region\": \"CA\"}}' " +
-                //    "- H 'Content-Type: application/json " +
-                //    "https://tile.googleapis.com/v1/createSession?key={API_key}"
-                //);
+        //sessionID = await http.PostAsync(
+        //    $"'{{\"mapType\": \"streetview\", \"language\": \"en-US\", \"region\": \"CA\"}}' " +
+        //    "- H 'Content-Type: application/json " +
+        //    "https://tile.googleapis.com/v1/createSession?key={API_key}"
+        //);
         //}
 
-        public void updateZoom(int update_val)
+        public void UpdateZoom(int update_val)
         {
-            zoom += update_val;
+            zoom += update_val * 22/100;
             if (zoom < 0)
                 zoom = 0;
             else if (zoom > 22)
                 zoom = 22;
         }
 
-        public void updateLngLat(Point distance)
+        public void UpdateLngLat(Point distance)
         {
             double lat_modifier = distance.Y * 360 / (800 * (Math.Pow(2, zoom)));
             double lng_modifier = -distance.X * 360 / (800 * (Math.Pow(2, zoom)));
@@ -72,7 +64,7 @@ namespace Map
 
         }
 
-        public ImageSource getMapTile(int x, int y)
+        public ImageSource GetMapTile(int x, int y)
         {
             BitmapImage bi3 = new BitmapImage();
             bi3.BeginInit();

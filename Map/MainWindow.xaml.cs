@@ -19,8 +19,9 @@ namespace Map
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MapBuilder map_builder;
+        private Controller controller;
         private Point mouse_down_loc;
+        private (double, double) map_dimensions;
         private ObservableCollection<ObservableCollection<Image>> image_grid;
 
         public MainWindow()
@@ -28,68 +29,75 @@ namespace Map
 
             InitializeComponent();
 
-            map_builder = new MapBuilder();
+            map_dimensions = (mapGrid.ActualHeight, mapGrid.ActualWidth);
+
+            controller = new Controller(this);
 
             image_grid = new ObservableCollection<ObservableCollection<Image>>();
-            for(int i = 0; i < 4; ++i)
+            for (int i = 0; i < 4; ++i)
             {
                 image_grid.Add(new ObservableCollection<Image>());
-                for(int j = 0; j < 4; ++j)
+                for (int j = 0; j < 4; ++j)
                 {
                     image_grid[i].Add(new Image());
                     Grid.SetColumn(image_grid[i][j], i);
                     Grid.SetRow(image_grid[i][j], j);
 
-                   mapGrid.RegisterName($"image_{i}{j}", image_grid[i][j]);
-                   mapGrid.Children.Add(image_grid[i][j]);
+                    mapGrid.RegisterName($"image_{i}{j}", image_grid[i][j]);
+                    mapGrid.Children.Add(image_grid[i][j]);
                 }
             }
 
-            updateMap();
 
-            updateLabels();
         }
 
-        private void updateLabels()
+        public (double, double) MapDimensions => map_dimensions;
+
+        public void UpdateLabels(double latitude, double longitude, float zoom)
         {
-            latitudeLabel.Content = $"Latitude: {map_builder.getLatitude()}";
-            longitudeLabel.Content = $"Longitude: {map_builder.getLongitude()}";
-            zoomLabel.Content = $"Zoom: {map_builder.getZoom()}";
+            latitudeLabel.Content = $"Latitude: {latitude}";
+            longitudeLabel.Content = $"Longitude: {longitude}";
+            zoomLabel.Content = $"Zoom: {zoom}";
         }
 
         private void MainWindow_OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            map_builder.updateZoom((e.Delta > 0) ? 1 : -1);
-            updateMap();
-            updateLabels();
+            controller.MouseWheel((e.Delta > 0) ? 1 : -1);
         }
 
-        private void mapGrid_MouseUp(object sender, MouseButtonEventArgs e)
+        private void MapGrid_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            Point drag_distance = (Point)((Point) e.GetPosition(this) - mouse_down_loc);
-            if (Math.Abs(drag_distance.X) + Math.Abs(drag_distance.Y) > 10)
-            {
-                map_builder.updateLngLat(drag_distance);
-                //MessageBox.Show($"Dragged {drag_distance.ToString()}");
-            }
-            updateMap();
-            updateLabels();
+            controller.MouseDragged(mouse_down_loc, e.GetPosition(this));
         }
 
-        private void mapGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        private void MapGrid_MouseDown(object sender, MouseButtonEventArgs e)
         {
             mouse_down_loc = e.GetPosition(this);
         }
 
-        private void updateMap()
+        // tiles is a list of image sources forming a square (throws an error if tiles.Count is not a perfect square)
+        // center_image is the index in tiles of the image which should be in the center of the screen
+        // center_point is the point in center_image which should be in the center of the screen
+        public void UpdateMap(List<ImageSource> tiles, int center_image, float center_point)
         {
+            if (Math.Sqrt(tiles.Count) % 1 != 0) {
+                throw new NonSquareMapException();
+            }
+
+            int image_count = 0;
+
             for (int i = 0; i < image_grid.Count; ++i)
             {
                 for (int j = 0; j < image_grid[i].Count; ++j)
                 {
-                    image_grid[i][j].Source = map_builder.getMapTile(i, j);
+                    image_grid[i][j].Source = controller.getMapTile(i, j);
                 }
             }
+        }
+
+        public class NonSquareMapException : Exception
+        {
+            public NonSquareMapException() : base() { }
         }
     }
 }

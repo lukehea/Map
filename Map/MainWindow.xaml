@@ -8,7 +8,7 @@
         Title="Map" Height="820" Width="800"
         ResizeMode="CanMinimize"
         MouseWheel="MainWindow_OnMouseWheel"
-        MouseDown="mapGrid_MouseDown" MouseUp="mapGrid_MouseUp"
+        MouseDown="MapGrid_MouseDown" MouseUp="MapGrid_MouseUp"
         Name="mapWindow"
         >
     <StackPanel>
