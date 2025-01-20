@@ -42,7 +42,8 @@ namespace Map
             // latitude and longitude are only updated if total movement is more than 3% of map length
             if (Math.Abs((start - end).X) + Math.Abs((start - end).Y) > 0.03)
             {
-                map_builder.UpdateLngLat(start, end);
+                // start and end points are reversed since the map should shift opposite to the drag direction
+                map_builder.UpdateLngLat(end, start);
 
                 view.UpdateLabels(map_builder.Latitude, map_builder.Longitude, map_builder.Zoom);
             }

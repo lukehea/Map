@@ -57,15 +57,28 @@ namespace Map
 
         public void UpdateLngLat(Point start, Point finish)
         {
-            Point start_latlng = PointToLatLng(start);
-            Point finish_latlng = PointToLatLng(finish);
+            Point start_latlng = WebMercatorToLatLng(ZoomOffset(start));
+            Point finish_latlng = WebMercatorToLatLng(ZoomOffset(finish));
 
-            Vector start_to_centre = start_latlng - latLng;
+            // generates the vector that transforms the start point to the finish point
+            Vector start_to_finish = finish_latlng - start_latlng;
 
-            latLng = finish_latlng + start_to_centre;
+            // uses the vector to transform centre point to the new latitude/longitude
+            latLng += start_to_finish;
         }
 
-        private Point PointToLatLng(Point p)
+        // transforms a point in the 1x1 zoomed map centred on latLng to a point in the complete world map
+        private Point ZoomOffset(Point p){
+            // gets the x y mercator coordinates of the current centre latitude/longitude            
+            Point centre_mercator = LatLngToWebMercator(latLng);
+
+            // gets the offset from the centre of the map to p
+            Vector offset = p - new Point(0.5,0.5);
+
+            return centre_mercator + offset;
+        }
+
+        private Point WebMercatorToLatLng(Point p)
         {
             Point return_val = new Point();
 
@@ -73,9 +86,20 @@ namespace Map
 
             return_val.X = (360 * p.X / length) - 180;
 
-            double mercN = ((length / 2) - p.Y) * (2 * Math.PI) / length;
-            double latRad = 2 * (Math.Atan(Math.Pow(Math.E, mercN)) - (Math.PI / 4));
-            return_val.Y = (180 * latRad) / Math.PI;
+            return_val.Y = 360 * Math.Atan(Math.Exp(((length / 2) - p.Y) * (2 * Math.PI) / length)) / Math.PI - 90;
+
+            return return_val;
+        }
+
+        private Point LatLngToWebMercator(Point p){
+            Point return_val = new Point();
+
+            double length = Math.Pow(2, zoom);
+
+            return_val.X = (latLng.X + 180) * (length / 360);
+
+            double mercN = Math.Log(Math.Tan((Math.PI / 4) + (latLng.Y * Math.PI / 360)));
+            return_val.Y = length * (0.5 - Math.Log(Math.Tan((1 + latLng.Y / 90) * (Math.PI / 4)) / (2 * Math.PI))); 
 
             return return_val;
         }
