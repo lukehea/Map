@@ -96,10 +96,9 @@ namespace Map
 
             double length = Math.Pow(2, zoom);
 
-            return_val.X = (latLng.X + 180) * (length / 360);
+            return_val.X = (p.X + 180) * (length / 360);
 
-            double mercN = Math.Log(Math.Tan((Math.PI / 4) + (latLng.Y * Math.PI / 360)));
-            return_val.Y = length * (0.5 - Math.Log(Math.Tan((1 + latLng.Y / 90) * (Math.PI / 4)) / (2 * Math.PI))); 
+            return_val.Y = length * (1 - Math.Log(Math.Tan((Math.PI / 4) + (p.Y * Math.PI / 360))) / Math.PI) / 2;
 
             return return_val;
         }
