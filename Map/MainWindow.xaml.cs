@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static Map.Utilities.Exceptions;
 
 namespace Map
 {
@@ -21,7 +22,8 @@ namespace Map
     {
         private Controller controller;
         private Point mouse_down_loc;
-        private (double, double) map_dimensions;
+        private Point map_dimensions; // height and width of the grid containing map tiles
+        private Point map_loc; // distance from top/leftmost point of window to top/leftmost point of map grid
         private ObservableCollection<ObservableCollection<Image>> image_grid;
 
         public MainWindow()
@@ -29,7 +31,8 @@ namespace Map
 
             InitializeComponent();
 
-            map_dimensions = (mapGrid.ActualHeight, mapGrid.ActualWidth);
+            map_dimensions = new Point(mapGrid.Height, mapGrid.Width);
+            map_loc = new Point(mapGrid.Margin.Top, mapGrid.Margin.Left);
 
             controller = new Controller(this);
 
@@ -51,9 +54,10 @@ namespace Map
 
         }
 
-        public (double, double) MapDimensions => map_dimensions;
+        public Point MapDimensions => map_dimensions;
+        public Point MapLocation => map_loc;
 
-        public void UpdateLabels(double latitude, double longitude, float zoom)
+        public void UpdateLabels(double latitude, double longitude, int zoom)
         {
             latitudeLabel.Content = $"Latitude: {latitude}";
             longitudeLabel.Content = $"Longitude: {longitude}";
@@ -86,18 +90,13 @@ namespace Map
 
             int image_count = 0;
 
-            for (int i = 0; i < image_grid.Count; ++i)
-            {
-                for (int j = 0; j < image_grid[i].Count; ++j)
-                {
-                    image_grid[i][j].Source = controller.getMapTile(i, j);
-                }
-            }
-        }
-
-        public class NonSquareMapException : Exception
-        {
-            public NonSquareMapException() : base() { }
+            //for (int i = 0; i < image_grid.Count; ++i)
+            //{
+            //    for (int j = 0; j < image_grid[i].Count; ++j)
+            //    {
+            //        image_grid[i][j].Source = controller.getMapTile(i, j);
+            //    }
+            //}
         }
     }
 }

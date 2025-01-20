@@ -17,7 +17,7 @@
             <Label Name="longitudeLabel"/>
             <Label Name="zoomLabel"/>
         </StackPanel>
-        <Grid Name="mapGrid" Margin="0,20,0,0" Height="800">
+        <Grid Name="mapGrid" Margin="0,20,0,0" Height="800" Width="800">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
