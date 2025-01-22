@@ -70,8 +70,6 @@ namespace Map
                 throw new NonUnitPointException();
             }
 
-            Point start_latlng = PointToLatLng(start);
-            Point finish_latlng = PointToLatLng(finish);
             Point start_latlng = WebMercatorToLatLng(ZoomOffset(start));
             Point finish_latlng = WebMercatorToLatLng(ZoomOffset(finish));
 
@@ -89,9 +87,10 @@ namespace Map
             // gets the x y mercator coordinates of the current centre latitude/longitude            
             Point centre_mercator = LatLngToWebMercator(centre_lng_lat);
 
-            Vector start_to_centre = start_latlng - latLng;
+            // gets the offset from the centre of the map to p
+            Vector offset = p - new Point(0.5, 0.5);
 
-            latLng = finish_latlng + start_to_centre;
+            return centre_mercator + offset;
         }
 
         private Point WebMercatorToLatLng(Point p)
