@@ -68,6 +68,8 @@ namespace Map
 
             // uses the vector to transform centre point to the new latitude/longitude
             latLng += start_to_finish;
+
+            FixLatLng();
         }
 
         // transforms a web mercator point in the 1x1 zoomed map centred on latLng to a point on the complete world map
@@ -104,6 +106,24 @@ namespace Map
             return_val.Y = length * (1 - Math.Log(Math.Tan((Math.PI / 4) + (p.Y * Math.PI / 360))) / Math.PI) / 2;
 
             return return_val;
+        }
+
+        // fixs the latitude/longitude to be within bounds
+        // longitude should be in -180 -> 180 range, otherwise remove full cycles, then cycle to the other end of the range
+        // latitude should be such that the visible bottom of the map is no more/less than +/-85.05112877980659 degrees (edge of web mercator projection)
+        private void FixLatLng(){
+            // removes multiples of 360 (full cycles)
+            latLng.X = latLng.X % 360;
+
+            // implements wraparound from 180 to -180
+            if(latLng.X > 180)
+                latLng.X = latLng.X % 180 - 180;
+            else if(latLng.X < -180)
+                latLng.X = latLng.X % 180 + 180;
+
+            
+
+            
         }
 
         public ImageSource GetMapTile(int x, int y)
