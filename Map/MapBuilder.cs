@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows;
 using System.Diagnostics.Eventing.Reader;
 using System.Collections;
+using static Map.Utilities.Exceptions;
 
 namespace Map
 {
@@ -57,6 +58,15 @@ namespace Map
 
         public void UpdateLngLat(Point start, Point finish)
         {
+            // throws an error if coordinates have not been normalized to a 1x1 plane
+            if(start.X > 1 || start.X < 0 ||
+                start.Y > 1 || start.Y < 0 ||
+                finish.X > 1 || finish.X < 0 ||
+                finish.Y > 1 || finish.Y < 0)
+            {
+                throw new NonUnitPointException();
+            }
+
             Point start_latlng = PointToLatLng(start);
             Point finish_latlng = PointToLatLng(finish);
 
