@@ -21,16 +21,16 @@ namespace Map
         };
         private string sessionID;
         private double zoom; // zoom level (0 -> 22)
-        private Point latLng; // current latitude/longitude of the centre of the map
+        private Point centre_lng_lat; // current latitude/longitude of the centre of the map
         public MapBuilder() {
             sessionID = "none";
             zoom = 0;
-            latLng = new Point(0, 0);
+            centre_lng_lat = new Point(0, 0);
         }
 
-        public double Latitude => latLng.Y;
+        public double Latitude => centre_lng_lat.Y;
 
-        public double Longitude => latLng.X;
+        public double Longitude => centre_lng_lat.X;
 
         // converts from 0 -> 22 range (for maps tile api) to 0 -> 100 range
         public int Zoom => (int) (zoom * 100/22);
@@ -67,7 +67,7 @@ namespace Map
             Vector start_to_finish = finish_latlng - start_latlng;
 
             // uses the vector to transform centre point to the new latitude/longitude
-            latLng += start_to_finish;
+            centre_lng_lat += start_to_finish;
 
             FixLatLng();
         }
@@ -75,7 +75,7 @@ namespace Map
         // transforms a web mercator point in the 1x1 zoomed map centred on latLng to a point on the complete world map
         private Point ZoomOffset(Point p){
             // gets the x y mercator coordinates of the current centre latitude/longitude            
-            Point centre_mercator = LatLngToWebMercator(latLng);
+            Point centre_mercator = LatLngToWebMercator(centre_lng_lat);
 
             // gets the offset from the centre of the map to p
             Vector offset = p - new Point(0.5,0.5);
@@ -113,17 +113,22 @@ namespace Map
         // latitude should be such that the visible bottom of the map is no more/less than +/-85.05112877980659 degrees (edge of web mercator projection)
         private void FixLatLng(){
             // removes multiples of 360 (full cycles)
-            latLng.X = latLng.X % 360;
+            centre_lng_lat.X = centre_lng_lat.X % 360;
 
             // implements wraparound from 180 to -180
-            if(latLng.X > 180)
-                latLng.X = latLng.X % 180 - 180;
-            else if(latLng.X < -180)
-                latLng.X = latLng.X % 180 + 180;
+            if(centre_lng_lat.X > 180)
+                centre_lng_lat.X = centre_lng_lat.X % 180 - 180;
+            else if(centre_lng_lat.X < -180)
+                centre_lng_lat.X = centre_lng_lat.X % 180 + 180;
 
-            
+            // finds the northern most allowable latitude
+            Point north_most = WebMercatorToLatLng(new Point(0, Math.Pow(2, zoom) - 0.5));
 
-            
+            // bounds centre latitude to between northernmost and southernmost allowable latitudes
+            if (centre_lng_lat.Y > north_most.Y)
+                centre_lng_lat.Y = north_most.Y;
+            else if(centre_lng_lat.Y < -north_most.Y)
+                centre_lng_lat.Y = -north_most.Y;
         }
 
         public ImageSource GetMapTile(int x, int y)
