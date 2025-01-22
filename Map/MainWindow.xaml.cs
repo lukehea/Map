@@ -36,21 +36,20 @@ namespace Map
 
             controller = new Controller(this);
 
-            image_grid = new ObservableCollection<ObservableCollection<Image>>();
-            for (int i = 0; i < 4; ++i)
-            {
-                image_grid.Add(new ObservableCollection<Image>());
-                for (int j = 0; j < 4; ++j)
-                {
-                    image_grid[i].Add(new Image());
-                    Grid.SetColumn(image_grid[i][j], i);
-                    Grid.SetRow(image_grid[i][j], j);
+            // image_grid = new ObservableCollection<ObservableCollection<Image>>();
+            // for (int i = 0; i < 4; ++i)
+            // {
+            //     image_grid.Add(new ObservableCollection<Image>());
+            //     for (int j = 0; j < 4; ++j)
+            //     {
+            //         image_grid[i].Add(new Image());
+            //         Grid.SetColumn(image_grid[i][j], i);
+            //         Grid.SetRow(image_grid[i][j], j);
 
-                    mapGrid.RegisterName($"image_{i}{j}", image_grid[i][j]);
-                    mapGrid.Children.Add(image_grid[i][j]);
-                }
-            }
-
+            //         mapGrid.RegisterName($"image_{i}{j}", image_grid[i][j]);
+            //         mapGrid.Children.Add(image_grid[i][j]);
+            //     }
+            // }
 
         }
 
@@ -84,6 +83,8 @@ namespace Map
         // center_point is the point in center_image which should be in the center of the screen
         public void UpdateMap(List<ImageSource> tiles, int center_image, float center_point)
         {
+
+            // checks that the number of tiles is square, throws an error otherwise
             if (Math.Sqrt(tiles.Count) % 1 != 0) {
                 throw new NonSquareMapException();
             }

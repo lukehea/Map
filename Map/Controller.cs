@@ -33,16 +33,18 @@ namespace Map
                 return;
             }
 
-            start.X = start.X / view.MapDimensions.X;
-            start.Y = start.Y / view.MapDimensions.Y;
+            // updates the start and end points from the map dimensions to a 1x1 plane
+            start.X = (start.X - view.MapLocation.X) / view.MapDimensions.X;
+            start.Y = (start.Y - view.MapLocation.Y) / view.MapDimensions.Y;
 
-            end.X = end.X / view.MapDimensions.X;
-            end.Y = end.Y / view.MapDimensions.Y;
+            end.X = (end.X - view.MapLocation.X) / view.MapDimensions.X;
+            end.Y = (end.Y - view.MapLocation.Y) / view.MapDimensions.Y;
 
             // latitude and longitude are only updated if total movement is more than 3% of map length
             if (Math.Abs((start - end).X) + Math.Abs((start - end).Y) > 0.03)
             {
-                map_builder.UpdateLngLat(start, end);
+                // start and end points are reversed since the map should shift opposite to the drag direction
+                map_builder.UpdateLngLat(end, start);
 
                 view.UpdateLabels(map_builder.Latitude, map_builder.Longitude, map_builder.Zoom);
             }
