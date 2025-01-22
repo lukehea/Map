@@ -47,7 +47,10 @@ namespace Map
 
         public void UpdateZoom(int update_val)
         {
+            // converts the update_val from the 0 -> 100 system range to the 0 -> 22 maps API range
             zoom += (double) update_val * 22/100;
+
+            // limits the zoom value to within the 0 -> 22 range
             if (zoom < 0)
                 zoom = 0;
             else if (zoom > 22)
@@ -67,7 +70,7 @@ namespace Map
             latLng += start_to_finish;
         }
 
-        // transforms a point in the 1x1 zoomed map centred on latLng to a point in the complete world map
+        // transforms a web mercator point in the 1x1 zoomed map centred on latLng to a point on the complete world map
         private Point ZoomOffset(Point p){
             // gets the x y mercator coordinates of the current centre latitude/longitude            
             Point centre_mercator = LatLngToWebMercator(latLng);
