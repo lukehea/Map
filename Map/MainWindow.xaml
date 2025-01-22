@@ -17,21 +17,7 @@
             <Label Name="longitudeLabel"/>
             <Label Name="zoomLabel"/>
         </StackPanel>
-        <Grid Name="mapGrid" Margin="0,20,0,0" Height="800" Width="800">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-        </Grid>
+        <Grid Name="mapGrid" Margin="0,20,0,0" Height="800" Width="800" /> <!-- populated in code-behind -->
     </StackPanel>
     
 </Window>

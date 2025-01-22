@@ -15,7 +15,7 @@ namespace Map
 
         public Controller(MainWindow window)
         {
-            map_builder = new MapBuilder();
+            map_builder = new MapBuilder(new TileApiFacade());
             view = window;
 
             UpdateLabels();

@@ -8,8 +8,6 @@ namespace Map.Utilities
 {
     internal class Exceptions
     {
-        public class NonSquareMapException : Exception { }
-
         public class NonUnitPointException : Exception { }
     }
 }

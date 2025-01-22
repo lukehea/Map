@@ -15,18 +15,13 @@ namespace Map
 {
     internal class MapBuilder
     {
-        private static string API_key = "";
-        private static HttpClient http = new()
-        {
-            BaseAddress = new Uri("https://jsonplaceholder.typicode.com"),
-        };
-        private string sessionID;
         private double zoom; // zoom level (0 -> 22)
         private Point centre_lng_lat; // current latitude/longitude of the centre of the map
-        public MapBuilder() {
-            sessionID = "none";
+        private TileApiFacade api_adapter;
+        public MapBuilder(TileApiFacade api) {
             zoom = 0;
             centre_lng_lat = new Point(0, 0);
+            api_adapter = api;
         }
 
         public double Latitude => centre_lng_lat.Y;
@@ -36,26 +31,19 @@ namespace Map
         // converts from 0 -> 22 range (for maps tile api) to 0 -> 100 range
         public int Zoom => (int) (zoom * 100/22);
 
-        //public async void getMapTile()
-        //{
-        //    if (sessionID == "none") ;
-        //sessionID = await http.PostAsync(
-        //    $"'{{\"mapType\": \"streetview\", \"language\": \"en-US\", \"region\": \"CA\"}}' " +
-        //    "- H 'Content-Type: application/json " +
-        //    "https://tile.googleapis.com/v1/createSession?key={API_key}"
-        //);
-        //}
-
         public void UpdateZoom(int update_val)
         {
             // converts the update_val from the 0 -> 100 system range to the 0 -> 22 maps API range
-            zoom += (double) update_val * 22/100;
+            zoom += ((double) update_val) * 22/100;
 
             // limits the zoom value to within the 0 -> 22 range
             if (zoom < 0)
                 zoom = 0;
             else if (zoom > 22)
                 zoom = 22;
+
+            // prevents the map from being centred too far north/south after zooming out
+            FixLatLng();
         }
 
 
@@ -132,7 +120,7 @@ namespace Map
                 centre_lng_lat.X = centre_lng_lat.X % 180 + 180;
 
             // finds the northern most allowable latitude
-            Point north_most = WebMercatorToLatLng(new Point(0, Math.Pow(2, zoom) - 0.5));
+            Point north_most = WebMercatorToLatLng(new Point(0, 0.5));
 
             // bounds centre latitude to between northernmost and southernmost allowable latitudes
             if (centre_lng_lat.Y > north_most.Y)

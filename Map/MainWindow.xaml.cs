@@ -31,8 +31,8 @@ namespace Map
 
             InitializeComponent();
 
-            map_dimensions = new Point(mapGrid.Height, mapGrid.Width);
-            map_loc = new Point(mapGrid.Margin.Top, mapGrid.Margin.Left);
+            map_dimensions = new Point(mapGrid.Width, mapGrid.Height);
+            map_loc = new Point(mapGrid.Margin.Left, mapGrid.Margin.Top);
 
             controller = new Controller(this);
 
@@ -78,16 +78,10 @@ namespace Map
             mouse_down_loc = e.GetPosition(this);
         }
 
-        // tiles is a list of image sources forming a square (throws an error if tiles.Count is not a perfect square)
         // center_image is the index in tiles of the image which should be in the center of the screen
         // center_point is the point in center_image which should be in the center of the screen
         public void UpdateMap(List<ImageSource> tiles, int center_image, float center_point)
         {
-
-            // checks that the number of tiles is square, throws an error otherwise
-            if (Math.Sqrt(tiles.Count) % 1 != 0) {
-                throw new NonSquareMapException();
-            }
 
             int image_count = 0;
 
